@@ -19,6 +19,9 @@ fn main() -> anyhow::Result<()> {
         fs::copy(orig_wzsound_file, modified_wzsound_file)
             .context("couldn't copy WZSound for backup")?;
     }
+    // create expected dirs
+    fs::create_dir_all("original").context("cannot create 'original' directory")?;
+    fs::create_dir_all("replacement").context("cannot create 'replacement' directory")?;
     // create readonly memmap of original (for searching)
     let orig_content = unsafe {
         MmapOptions::new().map(
@@ -35,9 +38,9 @@ fn main() -> anyhow::Result<()> {
 
     // get patches
     for i in 1..=500 {
-        let orig_audio_path = PathBuf::from(format!("Original Audio/exported/Audio[{i}]"));
+        let orig_audio_path = PathBuf::from(format!("original/Audio[{i}]"));
         let replacement_audio_path =
-            PathBuf::from(format!("Replacement Audio/exported/Audio[{i}]"));
+            PathBuf::from(format!("replacement/Audio[{i}]"));
         match (orig_audio_path.exists(), replacement_audio_path.exists()) {
             (false, false) => (),
             (true, false) | (false, true) => {
